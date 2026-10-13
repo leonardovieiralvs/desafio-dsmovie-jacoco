@@ -61,6 +61,11 @@ public class ScoreServiceTests {
 		Mockito.when(movieRepository.findById(nonExistingMovieId)).thenReturn(Optional.empty());
 		Mockito.when(scoreRepository.saveAndFlush(Mockito.any())).thenReturn(score);
 		Mockito.when(movieRepository.save(Mockito.any())).thenReturn(movie);
+		Mockito.doAnswer(invocation -> {
+			ScoreEntity newScore = invocation.getArgument(0);
+			movie.getScores().add(newScore);
+			return score;
+		}).when(scoreRepository).saveAndFlush(Mockito.any());
 	}
 
 	@Test
@@ -69,6 +74,8 @@ public class ScoreServiceTests {
 
 		Assertions.assertNotNull(result);
 		Assertions.assertEquals(existingMovieId, result.getId());
+		Assertions.assertEquals(4.5, result.getScore());
+		Assertions.assertEquals(1, result.getCount());
 	}
 
 	@Test
